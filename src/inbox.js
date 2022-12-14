@@ -12,7 +12,7 @@ function createInbox(btn) {
 
     inboxDiv.classList.add('inboxDiv');
     title.textContent = btn.textContent;
-    title.classList.add('title');
+    title.classList.add('todosTitle');
     
     taskList.classList.add('taskList');
     if (tasks.length != 0) {
@@ -28,10 +28,7 @@ function createInbox(btn) {
     addTaskPopup.classList.add('addTaskPopup');
     
     addTaskBtn.prepend(addIcon);
-    inboxDiv.append(title);
-    inboxDiv.append(taskList);
-    inboxDiv.append(addTaskBtn);
-    inboxDiv.append(addTaskPopup);
+    inboxDiv.append(title, taskList, addTaskBtn, addTaskPopup);
     
     return inboxDiv;
 }
@@ -42,12 +39,55 @@ function loadInbox(btn) {
     todos.append(createInbox(btn));
 }
 
-function addTask(name) {
+function addTask(taskList, name) {
+    const task = [name];
+    tasks.push(task);
+    loadTasks(taskList);
+}
+
+function loadTasks(taskList) {
+    //loop through tasks, add tasks to tasklist
+    taskList.style.display = 'flex';
+    tasks.forEach((task) => {
+        console.log(task);
+        createTaskDiv(taskList, task);
+    });
+}
+
+function createTaskDiv(taskList, task) {
+
+    const taskDiv = document.createElement('div');
+    const leftTaskDiv = document.createElement('div');
+    const rightTaskDiv = document.createElement('div');
+    const checkbox = document.createElement('i');
+    const name = document.createElement('p');
+    const remove = document.createElement('i');
+
+    taskDiv.classList.add('taskDiv');
+    leftTaskDiv.classList.add('leftTaskDiv');
+    checkbox.classList.add('checkbox');
+    name.classList.add('taskName');
+    remove.classList.add('taskRemove');
+    checkbox.classList.add('far', 'fa-circle');
+    remove.classList.add('fas', 'fa-times');
+    
+
+    name.textContent = task[0];
+
+    //add event listener for checkbox remove date
+
+    leftTaskDiv.append(checkbox, name);
+    rightTaskDiv.append(remove);
+    taskDiv.append(leftTaskDiv, rightTaskDiv);
+    taskList.append(taskDiv);
 
 }
 
-function loadTasks() {
+function removeTask(task) {
     
 }
 
-export default loadInbox;
+export {
+    loadInbox,
+    addTask
+}

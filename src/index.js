@@ -1,6 +1,5 @@
-import loadInbox from "./inbox.js";
-import addTask from "./inbox.js";
 import addProject from "./projects.js";
+import {addTask, loadInbox} from "./inbox.js";
 
 const buttons = document.querySelectorAll(".navElement");
 const addProjectPopup = document.querySelector(".addProjectPopup");
@@ -50,27 +49,33 @@ function addPrompt(button) {
     addPromptDiv.remove();
   });
 
-  addPromptDiv.append(name);
-  addPromptDiv.append(addBtn);
-  addPromptDiv.append(cancelBtn);
+  addPromptDiv.append(name, addBtn, cancelBtn);
 
   if (button.id == "addProject") {
     addPromptDiv.classList.add("addProjectDiv");
-    addBtn.addEventListener("click", () => {
-      addProject(name);
-      button.style.display = "flex";
-      addPromptDiv.remove();
-    });
     addProjectPopup.append(addPromptDiv);
-  } else {
+  }  
+  else {
     addPromptDiv.classList.add("addTaskDiv");
-    addBtn.addEventListener("click", () => {
-      addTask(name);
-      button.style.display = "flex";
-      addPromptDiv.remove();
-    });
     const addTaskPopup = document.querySelector(".addTaskPopup");
     addTaskPopup.append(addPromptDiv);
+  }
+  addBtn.addEventListener("click", e => handleAddClick(e.target, addPromptDiv, name, button.id));
+}
+
+function handleAddClick(button, addPromptDiv, name, id) {
+  console.log(name.value);
+  if (name.value == "")
+    confirm("Please enter a name");
+  else {
+    if (id == "addProject")
+      addProject(name.value);
+    else {
+      const taskList = document.querySelector(".taskList");
+      addTask(taskList, name.value);
+    }
+    button.style.display = "flex";
+    addPromptDiv.remove();
   }
 }
 
