@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To Do List</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="shortcut icon" type="image/png" href="images/logo.png" />
+    <script src="main.js" defer></script>
+    <script
+      src="https://kit.fontawesome.com/b7c442d3a1.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="images/logo.png" alt="logo" class="logo" />
+        <p class="title">To Do List</p>
+      </div>
+      <div class="sidenav">
+        <button class="navElement active" id="Inbox">
+          <i class="fa-solid fa-inbox"></i>
+          Inbox
+        </button>
+        <button class="navElement" id="Today">
+          <i class="fa-solid fa-calendar-day"></i>
+          Today
+        </button>
+        <button class="navElement" id="Week">
+          <i class="fa-solid fa-calendar-week"></i>
+          This week
+        </button>
+        <p id="projects">Projects</p>
+        <div class="projectList"></div>
+        <button class="navElement" id="addProject">
+          <i class="fa-solid fa-plus"></i>
+          Add Project
+        </button>
+        <div class="addProjectPopup"></div>
+      </div>
+      <div class="todos"></div>
+    </div>
+  </body>
+</html>
