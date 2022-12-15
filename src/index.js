@@ -8,15 +8,17 @@ buttons.forEach((button) =>
   button.addEventListener("click", (e) => handleNavClick(e.target))
 );
 
-function loadWebsite(button) {
-  loadInbox(button);
-}
-
 function handleNavClick(button) {
+  
   if (button.classList.contains("navElement")) {
+    
     if (button.classList.contains("active")) return;
-    if (button.id == "addProject") addPrompt(button);
+    if (button.id == "addProject") {
+      
+      addPrompt(button);
+    }
     else {
+      console.log(button.id);
       loadInbox(button.id);
       setActiveButton(button);
     }
@@ -40,8 +42,8 @@ function addPrompt(button) {
   name.setAttribute("type", "text");
   addBtn.classList.add("add");
   cancelBtn.classList.add("cancel");
-
-  button.style.display = "none";
+  button.classList.add("hidden");
+  
   addBtn.textContent = "Add";
   cancelBtn.textContent = "Cancel";
   cancelBtn.addEventListener("click", () => {
@@ -51,20 +53,22 @@ function addPrompt(button) {
 
   addPromptDiv.append(name, addBtn, cancelBtn);
 
+  let originalAddBtn;
   if (button.id == "addProject") {
     addPromptDiv.classList.add("addProjectDiv");
     addProjectPopup.append(addPromptDiv);
+    originalAddBtn = document.getElementById("addProject");
   }  
   else {
     addPromptDiv.classList.add("addTaskDiv");
     const addTaskPopup = document.querySelector(".addTaskPopup");
     addTaskPopup.append(addPromptDiv);
+    originalAddBtn = document.querySelector(".addTaskBtn");
   }
-  addBtn.addEventListener("click", e => handleAddClick(e.target, addPromptDiv, name, button.id));
+  addBtn.addEventListener("click", e => handleAddClick(originalAddBtn, addPromptDiv, name, button.id));
 }
 
 function handleAddClick(button, addPromptDiv, name, id) {
-  console.log(name.value);
   if (name.value == "")
     confirm("Please enter a name");
   else {
@@ -74,11 +78,11 @@ function handleAddClick(button, addPromptDiv, name, id) {
       const taskList = document.querySelector(".taskList");
       addTask(taskList, name.value);
     }
-    button.style.display = "flex";
+    button.classList.remove("hidden");
     addPromptDiv.remove();
   }
 }
 
-loadWebsite(document.getElementById("Inbox"));
+loadInbox("Inbox");
 
 export default addPrompt;
