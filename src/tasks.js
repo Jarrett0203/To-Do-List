@@ -1,7 +1,7 @@
 import addPrompt from "./index.js";
 
 class Task {
-    constructor(done, name, date = 'No date', project = 'No project') {
+    constructor(done, name, date = 'No date', project = 'Inbox') {
         this.done = done;
         this.name = name;
         this.date = date;
@@ -9,7 +9,14 @@ class Task {
     }
 }
 
-const tasks = [];
+const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+
+function loadInbox(id) {
+    const todos = document.querySelector('.todos');
+    todos.textContent = "";
+    todos.append(createInbox(id));
+}
 
 function createInbox(id) {
     const inboxDiv = document.createElement('div');
@@ -40,21 +47,17 @@ function createInbox(id) {
     return inboxDiv;
 }
 
-function loadInbox(id) {
-    const todos = document.querySelector('.todos');
-    todos.textContent = "";
-    todos.append(createInbox(id));
-}
-
 function addTask(taskList, name) {
     const task = new Task(false, name);
     tasks.push(task);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
     loadTasks(taskList);
 }
 
 function loadTasks(taskList) {
     //loop through tasks, add tasks to tasklist
     taskList.classList.remove('hidden');
+    console.log(tasks);
     taskList.textContent = "";
     tasks.forEach((task) => {
         createTaskDiv(taskList, task);
@@ -97,7 +100,7 @@ function createTaskDiv(taskList, task) {
         editTaskDate(e.target, task, date);
     });
     checkbox.addEventListener('click', e => toggleTask(e.target, taskList, task));
-    remove.addEventListener('click', () => toggleTask(taskList, task));
+    remove.addEventListener('click', () => removeTask(taskList, task));
 
     leftTaskDiv.append(checkbox, name, editName);
     rightTaskDiv.append(date, editDate, remove);
@@ -110,7 +113,14 @@ function toggleTask(checkbox, taskList, task) {
 }
 
 function removeTask(taskList, task) {
-    
+    console.log('test');
+    const index = tasks.indexOf(task);
+    tasks.splice(index, 1);
+    localStorage.setItem('tasks', tasks);
+    if (tasks.length != 0)
+        loadTasks(taskList);
+    else
+        taskList.classList.add('hidden');
 }
 
 function editTaskName(input, task, name) {
@@ -120,7 +130,7 @@ function editTaskName(input, task, name) {
     else {
         task.name = editedName;
         name.textContent = editedName;
-        console.log(tasks);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
         toggleVisibility(input, name);
     }
 }
@@ -133,7 +143,7 @@ function editTaskDate(input, task, date) {
     else {
         task.date = editedDate;
         date.textContent = editedDate;
-        console.log(tasks);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
         toggleVisibility(input, date);
     }
 }
@@ -142,7 +152,6 @@ function toggleVisibility(hide, show) {
     hide.classList.add("hidden");
     show.classList.remove("hidden");
 }
-
 
 export {
     loadInbox,

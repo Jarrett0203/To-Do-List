@@ -1,5 +1,5 @@
 import addProject from "./projects.js";
-import {addTask, loadInbox} from "./inbox.js";
+import {addTask, loadInbox} from "./tasks.js";
 
 const buttons = document.querySelectorAll(".navElement");
 const addProjectPopup = document.querySelector(".addProjectPopup");
@@ -9,12 +9,9 @@ buttons.forEach((button) =>
 );
 
 function handleNavClick(button) {
-  
   if (button.classList.contains("navElement")) {
-    
     if (button.classList.contains("active")) return;
     if (button.id == "addProject") {
-      
       addPrompt(button);
     }
     else {
@@ -65,15 +62,17 @@ function addPrompt(button) {
     addTaskPopup.append(addPromptDiv);
     originalAddBtn = document.querySelector(".addTaskBtn");
   }
-  addBtn.addEventListener("click", e => handleAddClick(originalAddBtn, addPromptDiv, name, button.id));
+  addBtn.addEventListener("click", () => handleAddClick(originalAddBtn, addPromptDiv, name, button.id));
 }
 
 function handleAddClick(button, addPromptDiv, name, id) {
   if (name.value == "")
     confirm("Please enter a name");
   else {
-    if (id == "addProject")
+    if (id == "addProject") {
+      const projectList = document.querySelector(".projectList");
       addProject(name.value);
+    }
     else {
       const taskList = document.querySelector(".taskList");
       addTask(taskList, name.value);
