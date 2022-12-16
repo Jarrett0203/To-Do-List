@@ -1,4 +1,5 @@
-import addPrompt from "./index.js";
+import {addPrompt} from "./index.js";
+import { format, addDays, differenceInDays, parseISO } from 'date-fns'
 
 class Task {
     constructor(done, name, date = 'No date', project = 'Inbox') {
@@ -11,8 +12,8 @@ class Task {
 
 const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
 
-
 function loadInbox(id) {
+    console.log(id);
     const todos = document.querySelector('.todos');
     todos.textContent = "";
     todos.append(createInbox(id));
@@ -31,13 +32,14 @@ function createInbox(id) {
     title.classList.add('todosTitle');
     
     taskList.classList.add('taskList', 'hidden');
-    if (tasks.length != 0)
-        loadTasks(taskList);
+    if (tasks.length != 0) {
+        loadTasks(taskList, id, false);
+    }
     
     addIcon.classList.add('fa-solid', 'fa-plus');
     addTaskBtn.textContent = 'Add Task';
     addTaskBtn.classList.add('addTaskBtn');
-    addTaskBtn.addEventListener('click', (e) => addPrompt(e.target));
+    addTaskBtn.addEventListener('click', (e) => addPrompt(e.target, id));
 
     addTaskPopup.classList.add('addTaskPopup');
     
@@ -47,24 +49,46 @@ function createInbox(id) {
     return inboxDiv;
 }
 
-function addTask(taskList, name) {
-    const task = new Task(false, name);
+function addTask(taskList, name, id) {
+    const task = new Task(false, name, 'No date', id);
     tasks.push(task);
     localStorage.setItem('tasks', JSON.stringify(tasks));
-    loadTasks(taskList);
+    loadTasks(taskList, id, false);
 }
 
-function loadTasks(taskList) {
+function loadTasks(taskList, id, removeProject) {
     //loop through tasks, add tasks to tasklist
     taskList.classList.remove('hidden');
-    console.log(tasks);
     taskList.textContent = "";
-    tasks.forEach((task) => {
-        createTaskDiv(taskList, task);
+    let filteredTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    console.log(filteredTasks);
+    const currentDate = new Date();
+    if (id === "Today") {
+        filteredTasks = filteredTasks.filter(task => task.date == format(currentDate, 'yyyy-MM-dd'));
+    }
+    else if (id === "Week") {
+        const next_week = addDays(currentDate, 7);
+        filteredTasks = filteredTasks.filter(task => {
+            if (task.date != 'No date') {
+                const taskDate = parseISO(task.date);
+                const diffNextWeek = differenceInDays(next_week, taskDate);
+                return diffNextWeek >= 0 && diffNextWeek <= 7 ;
+            }
+            return false;
+        });
+    }
+    else if (id != "Inbox") {
+        if (removeProject)
+            filteredTasks = filteredTasks.filter(task => task.project !== id);
+        else
+            filteredTasks = filteredTasks.filter(task => task.project === id);
+    }
+    filteredTasks.forEach(task => {
+        createTaskDiv(taskList, task, id);    
     });
 }
 
-function createTaskDiv(taskList, task) {
+function createTaskDiv(taskList, task, id) {
 
     const taskDiv = document.createElement('div');
     const leftTaskDiv = document.createElement('div');
@@ -100,7 +124,7 @@ function createTaskDiv(taskList, task) {
         editTaskDate(e.target, task, date);
     });
     checkbox.addEventListener('click', e => toggleTask(e.target, taskList, task));
-    remove.addEventListener('click', () => removeTask(taskList, task));
+    remove.addEventListener('click', () => removeTask(taskList, task, id));
 
     leftTaskDiv.append(checkbox, name, editName);
     rightTaskDiv.append(date, editDate, remove);
@@ -112,13 +136,12 @@ function toggleTask(checkbox, taskList, task) {
     removeTask(taskList, task);
 }
 
-function removeTask(taskList, task) {
-    console.log('test');
+function removeTask(taskList, task, id) {
     const index = tasks.indexOf(task);
     tasks.splice(index, 1);
-    localStorage.setItem('tasks', tasks);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
     if (tasks.length != 0)
-        loadTasks(taskList);
+        loadTasks(taskList, id, false);
     else
         taskList.classList.add('hidden');
 }
@@ -136,16 +159,13 @@ function editTaskName(input, task, name) {
 }
 
 function editTaskDate(input, task, date) {
-    console.log(input.value);
-    const editedDate = input.value;
+    let editedDate = input.value;
     if (editedDate === "")
         editedDate = "No date";
-    else {
-        task.date = editedDate;
-        date.textContent = editedDate;
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        toggleVisibility(input, date);
-    }
+    task.date = editedDate;
+    date.textContent = editedDate;
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    toggleVisibility(input, date);
 }
 
 function toggleVisibility(hide, show) {
@@ -155,5 +175,7 @@ function toggleVisibility(hide, show) {
 
 export {
     loadInbox,
+    loadTasks,
+    createInbox,
     addTask
 }

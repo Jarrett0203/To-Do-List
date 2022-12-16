@@ -1,4 +1,4 @@
-import addProject from "./projects.js";
+import {addProject, loadProjects } from "./projects.js";
 import {addTask, loadInbox} from "./tasks.js";
 
 const buttons = document.querySelectorAll(".navElement");
@@ -12,10 +12,9 @@ function handleNavClick(button) {
   if (button.classList.contains("navElement")) {
     if (button.classList.contains("active")) return;
     if (button.id == "addProject") {
-      addPrompt(button);
+      addPrompt(button, button.id);
     }
     else {
-      console.log(button.id);
       loadInbox(button.id);
       setActiveButton(button);
     }
@@ -23,13 +22,14 @@ function handleNavClick(button) {
 }
 
 function setActiveButton(button) {
+  const buttons = document.querySelectorAll(".navElement");
   buttons.forEach((b) => {
     if (b !== button) b.classList.remove("active");
   });
   button.classList.add("active");
 }
 
-function addPrompt(button) {
+function addPrompt(button, id) {
   const addPromptDiv = document.createElement("div");
   const name = document.createElement("input");
   const addBtn = document.createElement("button");
@@ -44,7 +44,7 @@ function addPrompt(button) {
   addBtn.textContent = "Add";
   cancelBtn.textContent = "Cancel";
   cancelBtn.addEventListener("click", () => {
-    button.style.display = "flex";
+    button.classList.remove("hidden");
     addPromptDiv.remove();
   });
 
@@ -62,7 +62,8 @@ function addPrompt(button) {
     addTaskPopup.append(addPromptDiv);
     originalAddBtn = document.querySelector(".addTaskBtn");
   }
-  addBtn.addEventListener("click", () => handleAddClick(originalAddBtn, addPromptDiv, name, button.id));
+  
+  addBtn.addEventListener("click", () => handleAddClick(originalAddBtn, addPromptDiv, name, id));
 }
 
 function handleAddClick(button, addPromptDiv, name, id) {
@@ -70,12 +71,11 @@ function handleAddClick(button, addPromptDiv, name, id) {
     confirm("Please enter a name");
   else {
     if (id == "addProject") {
-      const projectList = document.querySelector(".projectList");
       addProject(name.value);
     }
     else {
       const taskList = document.querySelector(".taskList");
-      addTask(taskList, name.value);
+      addTask(taskList, name.value, id);
     }
     button.classList.remove("hidden");
     addPromptDiv.remove();
@@ -83,5 +83,6 @@ function handleAddClick(button, addPromptDiv, name, id) {
 }
 
 loadInbox("Inbox");
+loadProjects();
 
-export default addPrompt;
+export {addPrompt, handleNavClick};
